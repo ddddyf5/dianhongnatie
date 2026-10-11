@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>十八世纪 · 贵族手写信</title>
+    <!-- 引入 html2canvas 用于导出图片 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* 基础重置与氛围 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #2e2a24; /* 深色背景衬托羊皮纸 */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 28px 16px;
+            font-family: 'Georgia', 'Times New Roman', 'Palatino', serif;
+        }
+
+        /* 主信纸容器——羊皮纸质感 */
+        .letter-wrapper {
+            position: relative;
+            width: 780px;
+            max-width: 100%;
+            background: #e9dfc7;  /* 泛黄羊皮纸基色 */
+            background-image: 
+                /* 自然旧纸张斑驳纹理（模拟纤维与深浅变化） */
+                radial-gradient(circle at 20% 30%, rgba(185, 155, 115, 0.08) 0%, transparent 28%),
+                radial-gradient(circle at 90% 70%, rgba(150, 120, 80, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 40% 85%, rgba(120, 90, 50, 0.06) 0%, transparent 35%),
+                radial-gradient(circle at 75% 15%, rgba(100, 70, 40, 0.07) 0%, transparent 30%),
+                /* 污渍/飞溅/灰尘——主要集中边缘与角落 */
+                radial-gradient(circle at 3% 12%, rgba(95, 70, 45, 0.18) 0%, transparent 18%),
+                radial-gradient(circle at 97% 88%, rgba(80, 60, 35, 0.22) 0%, transparent 22%),
+                radial-gradient(circle at 88% 6%, rgba(110, 80, 50, 0.14) 0%, transparent 14%),
+                radial-gradient(circle at 12% 94%, rgba(70, 50, 30, 0.18) 0%, transparent 16%),
+                radial-gradient(circle at 45% 2%, rgba(130, 100, 70, 0.10) 0%, transparent 12%),
+                radial-gradient(circle at 96% 42%, rgba(90, 70, 45, 0.12) 0%, transparent 14%),
+                radial-gradient(circle at 4% 58%, rgba(85, 65, 40, 0.10) 0%, transparent 15%),
+                /* 少量霉斑感 */
+                radial-gradient(circle at 18% 8%, rgba(100, 85, 60, 0.10) 0%, transparent 7%),
+                radial-gradient(circle at 82% 94%, rgba(75, 65, 45, 0.12) 0%, transparent 9%),
+                radial-gradient(circle at 60% 96%, rgba(95, 80, 55, 0.08) 0%, transparent 6%),
+                radial-gradient(circle at 40% 4%, rgba(115, 95, 70, 0.08) 0%, transparent 6%);
+            /* 纸张边缘磨损感——使用 box-shadow 模拟不规则边缘 */
+            box-shadow: 
+                0 0 0 1px rgba(140, 110, 80, 0.3),
+                0 12px 35px rgba(0, 0, 0, 0.5),
+                inset 0 0 40px rgba(150, 120, 85, 0.15),
+                inset 0 0 15px rgba(100, 70, 40, 0.2);
+            border-radius: 2px 6px 4px 8px;  /* 轻微不规则边缘 */
+            padding: 45px 45px 55px 55px;
+            transition: all 0.2s ease;
+            /* 模拟纸张轻微不平整的纹理，加一点非常淡的杂点 */
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+        }
+
+        /* 额外叠加一层极细微的纸张颗粒（用伪类实现灰尘、颗粒） */
+        .letter-wrapper::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 0.3 0 0 0 0 0.2 0 0 0 0 0.1 0 0 0 0.06 0"/></filter><rect width="200" height="200" filter="url(%23noise)" opacity="0.12"/></svg>');
+            background-repeat: repeat;
+            background-size: 180px 180px;
+            border-radius: inherit;
+            mix-blend-mode: multiply;
+            opacity: 0.5;
+            z-index: 0;
+        }
+
+        /* 污渍/飞溅的额外层：模拟泥土飞溅点状 */
+        .letter-wrapper::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-image: 
+                radial-gradient(circle at 8% 18%, rgba(75, 55, 30, 0.16) 1px, transparent 3px),
+                radial-gradient(circle at 15% 72%, rgba(70, 50, 28, 0.14) 1px, transparent 4px),
+                radial-gradient(circle at 92% 28%, rgba(80, 60, 35, 0.15) 1px, transparent 3px),
+                radial-gradient(circle at 87% 65%, rgba(65, 45, 25, 0.18) 2px, transparent 4px),
+                radial-gradient(circle at 5% 88%, rgba(60, 45, 25, 0.16) 1px, transparent 3px),
+                radial-gradient(circle at 96% 12%, rgba(75, 55, 30, 0.14) 1px, transparent 3px),
+                radial-gradient(circle at 72% 95%, rgba(70, 50, 30, 0.12) 1px, transparent 3px),
+                radial-gradient(circle at 33% 7%, rgba(85, 65, 40, 0.10) 1px, transparent 2px);
+            background-repeat: no-repeat;
+            z-index: 0;
+        }
+
+        /* 确保内容在纹理之上 */
+        .letter-content {
+            position: relative;
+            z-index: 5;
+            color: #3c2e1f;  /* 深炭褐色，非纯黑 */
+            font-family: 'Georgia', 'Times New Roman', 'Palatino', 'Book Antiqua', serif;
+            text-shadow: 0 0 1px rgba(90, 70, 45, 0.2);  /* 极轻微墨水晕染 */
+            letter-spacing: 0.3px;
+        }
+
+        /* 顶部复古花体书信抬头 */
+        .letter-head {
+            text-align: center;
+            margin-bottom: 28px;
+            position: relative;
+        }
+
+        .letter-head h1 {
+            font-family: 'Palatino', 'Georgia', 'Times New Roman', serif;
+            font-weight: 400;
+            font-size: 2.1rem;
+            letter-spacing: 6px;
+            word-spacing: 8px;
+            color: #4a3724;
+            text-transform: uppercase;
+            font-style: italic;
+            text-shadow: 1px 1px 0 rgba(180, 150, 110, 0.3), 0 0 6px rgba(130, 100, 65, 0.2);
+            transform: scaleY(1.05);
+            border-bottom: 1px solid rgba(120, 90, 60, 0.25);
+            padding-bottom: 12px;
+            display: inline-block;
+            padding-left: 18px;
+            padding-right: 18px;
+        }
+
+        /* 花体装饰小元素 */
+        .letter-head .flourish {
+            display: block;
+            font-size: 1.6rem;
+            color: #7a6248;
+            opacity: 0.6;
+            letter-spacing: 12px;
+            margin-top: -6px;
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        /* 正文段落——古典书信缩进，宽松行距 */
+        .letter-body {
+            font-size: 1.22rem;
+            line-height: 2.1;
+            text-indent: 2.8em;
+            margin-bottom: 1.2em;
+            font-weight: 400;
+            word-spacing: 0.05em;
+            text-align: justify;
+            text-justify: inter-word;
+            hyphens: auto;
+        }
+
+        /* 首段稍微特殊，有时老信纸首段缩进稍大 */
+        .letter-body:first-of-type {
+            text-indent: 3.2em;
+        }
+
+        /* 落款区域，右对齐 */
+        .letter-signature {
+            margin-top: 40px;
+            text-align: right;
+            font-size: 1.2rem;
+            line-height: 2;
+            font-style: italic;
+            letter-spacing: 0.8px;
+            color: #4d3a28;
+        }
+
+        .letter-signature .date {
+            display: block;
+            margin-bottom: 8px;
+            font-style: normal;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .letter-signature .name {
+            font-size: 1.5rem;
+            font-family: 'Palatino', 'Georgia', serif;
+            font-style: italic;
+            border-bottom: 1px dashed rgba(120, 90, 60, 0.4);
+            padding-bottom: 4px;
+            display: inline-block;
+            padding-right: 15px;
+        }
+
+        /* 低调火漆印章效果 (右下角) */
+        .wax-seal {
+            position: absolute;
+            bottom: 60px;
+            right: 45px;
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #9b3f2c, #6b2a1c);
+            opacity: 0.55;
+            box-shadow: 
+                0 4px 8px rgba(0, 0, 0, 0.4),
+                inset 0 -3px 6px rgba(0, 0, 0, 0.4),
+                inset 0 3px 6px rgba(255, 200, 150, 0.2);
+            transform: rotate(8deg);
+            filter: blur(0.2px);
+            border: 1px solid rgba(60, 30, 20, 0.5);
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        /* 印章内部纹理 */
+        .wax-seal::after {
+            content: "✠";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-5deg);
+            font-size: 2rem;
+            color: #bd8b6b;
+            opacity: 0.6;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            font-family: 'Times New Roman', serif;
+        }
+
+        /* 底部欧式花纹装饰 */
+        .bottom-ornament {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 1.5rem;
+            letter-spacing: 12px;
+            color: #a08464;
+            opacity: 0.5;
+            font-weight: 300;
+            font-style: italic;
+            border-top: 1px solid rgba(130, 100, 70, 0.2);
+            padding-top: 18px;
+            width: 70%;
+            margin-left: auto;
+            margin-right: auto;
+            transform: scaleX(1.1);
+        }
+
+        /* 轻微折痕效果——横向淡线 */
+        .fold-line {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(130, 100, 70, 0.12) 20%, rgba(130, 100, 70, 0.18) 50%, rgba(130, 100, 70, 0.12) 80%, transparent);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .fold-line.top {
+            top: 32%;
+        }
+
+        .fold-line.bottom {
+            top: 68%;
+        }
+
+        /* 按钮——导出图片，但不干扰信纸本身，放在页面上方 */
+        .export-btn {
+            margin-top: 28px;
+            background: #3f3224;
+            border: 1px solid #b39b7c;
+            color: #e9dfc7;
+            font-size: 1rem;
+            padding: 12px 32px;
+            border-radius: 30px;
+            letter-spacing: 2px;
+            font-family: 'Georgia', serif;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            opacity: 0.9;
+            font-weight: 400;
+            backdrop-filter: blur(1px);
+        }
+
+        .export-btn:hover {
+            background: #554432;
+            border-color: #dac29e;
+            color: #f5efe2;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+            letter-spacing: 3px;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 700px) {
+            .letter-wrapper {
+                padding: 30px 25px 45px 30px;
+            }
+
+            .letter-head h1 {
+                font-size: 1.7rem;
+                letter-spacing: 4px;
+            }
+
+            .letter-body {
+                font-size: 1.05rem;
+                line-height: 1.9;
+                text-indent: 2.2em;
+            }
+
+            .wax-seal {
+                width: 52px;
+                height: 52px;
+                right: 25px;
+                bottom: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 信纸主体 -->
+    <div class="letter-wrapper" id="letterCapture">
+        <!-- 折痕线（低调） -->
+        <div class="fold-line top"></div>
+        <div class="fold-line bottom"></div>
+
+        <!-- 内容区域 -->
+        <div class="letter-content">
+            <!-- 顶部花体书信抬头 -->
+            <div class="letter-head">
+                <h1>Epistola</h1>
+                <span class="flourish">❦ ❦ ❦</span>
+            </div>
+
+            <!-- 正文：可直接替换以下文字 -->
+            <p class="letter-body">
+                我亲爱的朋友，当您展开这封信时，愿晨光与安宁一同降临在您的书房。自上次一别，已有数月未曾通信，不知您是否依旧在傍晚时分漫步于那一片椴树林间，聆听风声与落叶的私语。
+            </p>
+            <p class="letter-body">
+                近日我整理旧物，偶然翻出我们年少时互赠的诗集，纸页虽已泛黄，但那些字句仍如当初一般滚烫。我常在黄昏提笔，想将心中所感尽数写下，却又恐言语笨拙，扰了您的清静。
+            </p>
+            <p class="letter-body">
+                请不必挂念我，这里一切如常。只是每当雨水敲打窗棂，我仍会想起我们围炉夜谈的时光。盼您珍重身体，待来年春天，或许我们能再聚于那座小小的庄园。
+            </p>
+
+            <!-- 落款 -->
+            <div class="letter-signature">
+                <span class="date">1762年 于 枫丹白露</span>
+                <span class="name">您忠实的  A. 德·蒙塔朗</span>
+            </div>
+
+            <!-- 底部花纹装饰 -->
+            <div class="bottom-ornament">✧ ✦ ✧ ✦ ✧</div>
+        </div>
+
+        <!-- 低调火漆印章 -->
+        <div class="wax-seal"></div>
+    </div>
+
+    <!-- 导出按钮（不影响信纸，独立在外） -->
+    <button class="export-btn" id="exportBtn">导出高清图片</button>
+
+    <script>
+        (function() {
+            const exportBtn = document.getElementById('exportBtn');
+            const captureElement = document.getElementById('letterCapture');
+
+            async function exportAsImage() {
+                if (!captureElement) return;
+
+                // 设置导出图片的缩放比例，保证高清 (2倍)
+                const scale = 2.5;  // 略微提高清晰度，同时保留细节
+
+                try {
+                    // 使用 html2canvas 渲染节点
+                    const canvas = await html2canvas(captureElement, {
+                        scale: scale,
+                        backgroundColor: null,          // 保留透明背景？但信纸有底色，建议保持自身背景
+                        allowTaint: false,
+                        useCORS: true,
+                        logging: false,
+                        // 以下选项让渲染更加柔和
+                        windowWidth: captureElement.scrollWidth,
+                        windowHeight: captureElement.scrollHeight,
+                        onclone: (clonedDoc) => {
+                            // 可选：在克隆节点中微调，但通常不用
+                        }
+                    });
+
+                    // 将canvas转换为PNG数据URL
+                    const image = canvas.toDataURL('image/png', 1.0);
+
+                    // 创建下载链接
+                    const link = document.createElement('a');
+                    link.download = '18th-century-letter.png';
+                    link.href = image;
+                    link.click();
+
+                } catch (error) {
+                    console.error('导出失败:', error);
+                    alert('导出图片失败，请检查控制台信息。');
+                }
+            }
+
+            // 绑定导出按钮点击事件
+            exportBtn.addEventListener('click', exportAsImage);
+
+            // 可选：增加一点加载时的小细节，无现代元素
+            console.log('🕯️ 信纸已就绪 — 替换正文即可保留所有样式');
+        })();
+    </script>
+</body>
+</html>
